@@ -1,14 +1,3 @@
-#!/usr/bin/env python3
-"""
-Class-based MAC Changer:
- - Prints current MAC
- - Changes MAC (to provided or random)
- - Prints new MAC
-
-Usage:
-  sudo ./mac_changer.py <interface> [new_mac]
-"""
-
 import os
 import random
 import re
@@ -18,7 +7,7 @@ import sys
 class MacChanger:
     MAC_RE = re.compile(r"([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}")
 
-    def __init__(self, interface: str, new_mac: str = None):
+    def __init__(self, interface: str, new_mac: str):
         self.interface = interface
         self.new_mac = new_mac.lower() if new_mac else None
 
@@ -39,7 +28,7 @@ class MacChanger:
     def get_current_mac(self) -> str:
         output = self._run(["ip", "link", "show", "dev", self.interface])
         match = self.MAC_RE.search(output)
-        return match.group(0) if match else None
+        return match.group(0) if match else ""
 
     def _validate_mac(self, mac: str) -> bool:
         return bool(self.MAC_RE.fullmatch(mac))
@@ -86,7 +75,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     iface = sys.argv[1]
-    mac = sys.argv[2] if len(sys.argv) > 2 else None
+    mac = sys.argv[2] if len(sys.argv) > 2 else ""
 
     changer = MacChanger(iface, mac)
     try:
